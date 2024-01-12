@@ -1,4 +1,6 @@
-# core
+# @rustd/core
+
+Rustd Core is a package that provides Rust's idiomatic features implemented to use in JavaScript.
 
 This library was generated with [Nx](https://nx.dev).
 
