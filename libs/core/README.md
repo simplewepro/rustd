@@ -17,11 +17,11 @@ type Result<T,E> // where T is your data and E is error type
 `Result<T,E>` can take a form of one of variants: `Ok(T)` and `Err(E)`
 
 ```typescript
-const result = new Ok(42)
+const result = new Ok(42);
 //      ^? => const result: OK<number>
-const error = new Err('Expecting an error')
+const error = new Err('Expecting an error');
 //      ^? => const error: Err<string>
-const typeError = new Err(new TypeError('Some types does not match!'))
+const typeError = new Err(new TypeError('Some types does not match!'));
 //      ^? => const typeError: Err<TypeError>
 ```
 
@@ -30,21 +30,21 @@ const typeError = new Err(new TypeError('Some types does not match!'))
 ```typescript
 function getResult(condition): Result<number, string> {
   if (condition) {
-    return new Ok(42)
+    return new Ok(42);
   } else {
-    return new Err('Some error')
+    return new Err('Some error');
   }
 }
 
-const result = getResult(true)
+const result = getResult(true);
 //      ^? => const result: Result<number, string>
-retult.isOk() // => true
-const value = result.unwrap() // => 42
+retult.isOk(); // => true
+const value = result.unwrap(); // => 42
 
-const error = getResult(false)
+const error = getResult(false);
 //      ^? => const error: Result<number, string>
-error.isErr() // => true
-const errorValue = error.unwrap() // throws an error with message 'Some error'
+error.isErr(); // => true
+const errorValue = error.unwrap(); // throws an error with message 'Some error'
 ```
 
 ## Option
@@ -60,9 +60,9 @@ type Option<T> // where T is your data
 `Option<T>` can take a form of one of variants: `Some(T)` and `None`
 
 ```typescript
-const some = new Some(42)
+const some = new Some(42);
 //      ^? => const some: Some<number>
-const none = new None()
+const none = new None();
 //      ^? => const none: None
 ```
 
@@ -71,22 +71,22 @@ const none = new None()
 ```typescript
 function getOption(condition): Option<number> {
   if (condition) {
-    return new Some(42)
+    return new Some(42);
   } else {
-    return new None()
+    return new None();
   }
 }
 
-const some = getOption(true)
+const some = getOption(true);
 //      ^? => const some: Option<number>
-some.isSome() // => true
-const value = some.unwrap() // => 42
+some.isSome(); // => true
+const value = some.unwrap(); // => 42
 
-const none = getOption(false)
+const none = getOption(false);
 //      ^? => const none: Option<number>
-none.isNone() // => true
+none.isNone(); // => true
 
-const errorValue = none.unwrap() // throws an error with message 'No value'
+const errorValue = none.unwrap(); // throws an error with message 'No value'
 ```
 
 <hr>
