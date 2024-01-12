@@ -7,10 +7,10 @@ export enum OptionType {
   None,
 }
 
-abstract class OptionBase<T> {
+abstract class OptionBase<T = undefined> {
   abstract type: OptionType;
 
-  abstract unwrap(): T | never;
+  abstract unwrap(): T;
   abstract toString(): string;
 
   public isSome(): this is Some<T> {
@@ -42,7 +42,7 @@ export class Some<T> extends OptionBase<T> {
   }
 }
 
-export class None extends OptionBase<never> {
+export class None extends OptionBase {
   type = OptionType.None;
 
   unwrap(): never {
