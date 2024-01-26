@@ -22,7 +22,7 @@ abstract class ResultBase<T, E> {
    * @returns {T} the `T` if the result is `Ok`, throws an error otherwise
    * @throws {E} the error if the result is `Err`
    */
-  abstract unwrap(): T | never;
+  public abstract unwrap(): T | never;
 
   constructor(protected _value: T | E) {}
 
@@ -80,9 +80,7 @@ abstract class ResultBase<T, E> {
    *
    * @returns `Option`
    */
-  public ok(): Option<T> {
-    return this.isOk() ? new Some(this.unwrap()) : new None();
-  }
+  public abstract ok(): Option<T>;
 
   /**
    * A method that turns a `Result<T, E>` into an `Option<E>`
@@ -93,9 +91,7 @@ abstract class ResultBase<T, E> {
    *
    * @returns `Option`
    */
-  public err(): Option<E> {
-    return this.isErr() ? new Some(this._value) : new None();
-  }
+  public abstract err(): Option<E>;
 
   /**
    * A method maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
@@ -103,11 +99,7 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns `Result<U, E>`
    */
-  public map<U>(callbackFn: (value: T) => U): Result<U, E> {
-    return this.isOk()
-      ? new Ok(callbackFn(this.unwrap()))
-      : new Err(this.err().unwrap());
-  }
+  public abstract map<U>(callbackFn: (value: T) => U): Result<U, E>;
 
   /**
    * A method returns the provided default (if `Err`) or applies the provided function (if `Ok`) to value and returns the result
@@ -115,9 +107,7 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns
    */
-  public map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U {
-    return this.isOk() ? callbackFn(this.unwrap()) : defaultVal;
-  }
+  public abstract map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U;
 
   /**
    * A method that maps a `Result<T, E>` to `U` by applying a function to a contained `Ok` value, or a fallback function to a contained `Err` value.
@@ -126,14 +116,10 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns
    */
-  public map_or_else<U>(
+  public abstract map_or_else<U>(
     errCallbackFn: (error: E) => U,
     callbackFn: (value: T) => U
-  ): U {
-    return this.isOk()
-      ? callbackFn(this.unwrap())
-      : errCallbackFn(this.err().unwrap());
-  }
+  ): U;
 
   /**
    * A method that maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
@@ -143,9 +129,7 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the error `E` and returns a new error `F`
    * @returns Result<T, F>
    */
-  public map_err<F>(callbackFn: (error: E) => F): Result<T, F> {
-    return this.isOk() ? this : new Err(callbackFn(this.err().unwrap()));
-  }
+  public abstract map_err<F>(callbackFn: (error: E) => F): Result<T, F>;
 
   /**
    * A method that calls `callbackFn` with contained value if the result is `Ok`
@@ -153,13 +137,7 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a callback function to be called with contained value if `Ok`
    * @returns {this} `this`
    */
-  public inspect(callbackFn: (value: T) => void): this {
-    if (this.isOk()) {
-      callbackFn(this.unwrap());
-    }
-
-    return this;
-  }
+  public abstract inspect(callbackFn: (value: T) => void): this;
 
   /**
    * A method that calls `callbackFn` with contained error if the result is `Err`
@@ -167,13 +145,7 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a callback function to be called with contained error if `Err`
    * @returns {this} `this`
    */
-  public inspect_err(callbackFn: (error: E) => void): this {
-    if (this.isErr()) {
-      callbackFn(this.err().unwrap());
-    }
-
-    return this;
-  }
+  public abstract inspect_err(callbackFn: (error: E) => void): this;
 
   /**
    * A method that returns an iterator over the possibly contained value.
@@ -192,13 +164,7 @@ abstract class ResultBase<T, E> {
    * @param  {string} message
    * @returns `T`
    */
-  public expect(message: string): T {
-    if (this.isErr()) {
-      throw new Error(`${message}: ${this._value}`);
-    }
-
-    return this.unwrap();
-  }
+  public abstract expect(message: string): T;
 
   [inspect.custom](): string {
     return this.toString();
@@ -212,6 +178,47 @@ export class Ok<T> extends ResultBase<T, never> {
     return this._value;
   }
 
+  public ok(): Option<T> {
+    return new Some(this._value);
+  }
+
+  public err(): Option<never> {
+    return new None();
+  }
+
+  public map<U>(callbackFn: (value: T) => U): Result<U, never> {
+    return new Ok(callbackFn(this.unwrap()));
+  }
+
+  public map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U {
+    return callbackFn(this._value);
+  }
+
+  public map_or_else<U>(
+    _errCallbackFn: (error: never) => U,
+    callbackFn: (value: T) => U
+  ): U {
+    return callbackFn(this._value);
+  }
+
+  public map_err<F>(): Result<T, F> {
+    return this;
+  }
+
+  public inspect(callbackFn: (value: T) => void): this {
+    callbackFn(this._value);
+
+    return this;
+  }
+
+  public inspect_err(): this {
+    return this;
+  }
+
+  public expect(): T {
+    return this._value;
+  }
+
   toString(): string {
     return `Ok(${this._value})`;
   }
@@ -222,6 +229,44 @@ export class Err<E> extends ResultBase<never, E> {
 
   public unwrap(): never {
     throw new Error(`${this.err().unwrap()}`);
+  }
+
+  public ok(): Option<never> {
+    return new None();
+  }
+
+  public err(): Option<E> {
+    return new Some(this._value);
+  }
+
+  public map<U>(): Result<U, E> {
+    return this;
+  }
+
+  public map_or<U>(defaultVal: U): U {
+    return defaultVal;
+  }
+
+  public map_or_else<U>(errCallbackFn: (error: E) => U): U {
+    return errCallbackFn(this._value);
+  }
+
+  public map_err<F>(callbackFn: (error: E) => F): Result<never, F> {
+    return new Err(callbackFn(this._value));
+  }
+
+  public inspect(): this {
+    return this;
+  }
+
+  public inspect_err(callbackFn: (error: E) => void): this {
+    callbackFn(this._value);
+
+    return this;
+  }
+
+  public expect(message: string): never {
+    throw new Error(`${message}: ${this._value}`);
   }
 
   toString(): string {
