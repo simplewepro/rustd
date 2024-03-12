@@ -1,1 +1,2 @@
-export * from './lib/core';
+export * from './lib/Result';
+export * from './lib/Option';

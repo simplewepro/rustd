@@ -28,6 +28,13 @@
       "options": {
         "jestConfig": "libs/core/jest.config.ts"
       }
+    },
+    "test-watch": {
+      "executor": "@nx/jest:jest",
+      "options": {
+        "jestConfig": "libs/core/jest.config.ts",
+        "watch": true
+      }
     }
   },
   "tags": []
