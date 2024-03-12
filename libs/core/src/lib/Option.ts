@@ -38,7 +38,7 @@ export class Some<T> extends OptionBase<T> {
   }
 
   toString(): string {
-    return `Some(${this.value})`;
+    return `Some(${JSON.stringify(this.value)})`;
   }
 }
 

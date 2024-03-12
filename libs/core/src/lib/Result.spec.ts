@@ -82,6 +82,14 @@ describe('Result tests', () => {
       }
     });
 
+    it(`[unwrap_or(2)] should be ${isOk ? unwrapped : 2}`, () => {
+      expect(result.unwrap_or(2)).toBe(isOk ? unwrapped : 2);
+    });
+
+    it(`[unwrap_or_else(() => 2)] should be ${isOk ? unwrapped : 2}`, () => {
+      expect(result.unwrap_or_else(() => 2)).toBe(isOk ? unwrapped : 2);
+    });
+
     it(`[map(x => x + 1)] should be ${
       isOk ? new Ok(unwrapped! + 1) : new Err(error)
     }`, () => {
@@ -90,8 +98,97 @@ describe('Result tests', () => {
       );
     });
 
+    it(`[map_or(0, x => x + 1)] should be ${isOk ? unwrapped! + 1 : 0}`, () => {
+      expect(result.map_or(0, (value) => value + 1)).toBe(
+        isOk ? unwrapped! + 1 : 0
+      );
+    });
+
+    it(`[map_or_else(x => x + 1, () => 0)] should be ${
+      isOk ? unwrapped! + 1 : 0
+    }`, () => {
+      expect(
+        result.map_or_else(
+          () => 0,
+          (value) => value + 1
+        )
+      ).toBe(isOk ? unwrapped! + 1 : 0);
+    });
+
+    it(`[map_err(x => x + 1)] should be ${
+      isOk ? result : new Err(error)
+    }`, () => {
+      expect(result.map_err((err) => `prefix: ${err}`)).toStrictEqual(
+        isOk ? result : new Err(`prefix: ${error}`)
+      );
+    });
+
+    it(`[expect()] should ${
+      isOk ? `be ${unwrapped}` : 'throw expected error'
+    }`, () => {
+      if (isOk) {
+        expect(result.expect('expected error')).toBe(unwrapped);
+      } else {
+        expect(() => result.expect('expected error')).toThrow('expected error');
+      }
+    });
+
+    it(`[expect_err('expected error')] should ${
+      isOk ? 'throw' : `throw expected error: ${error}`
+    }`, () => {
+      if (isOk) {
+        expect(() => result.expect_err('expected error')).toThrow(
+          `expected error: ${unwrapped}`
+        );
+      } else {
+        expect(result.expect_err('expected error')).toStrictEqual(error);
+      }
+    });
+
+    it(`[unwrap_err()] should ${isOk ? 'throw' : `be ${error}`}`, () => {
+      if (isOk) {
+        expect(() => result.unwrap_err()).toThrow(new Error(String(unwrapped)));
+      } else {
+        expect(result.unwrap_err()).toStrictEqual(error);
+      }
+    });
+
+    it(`[inspect(x => console.log(x))] should ${
+      isOk ? `log ${unwrapped}` : 'not log'
+    }`, () => {
+      const fn = jest.fn();
+      result.inspect(fn);
+      expect(fn).toHaveBeenCalledTimes(isOk ? 1 : 0);
+
+      if (isOk) {
+        expect(fn).toHaveBeenCalledWith(unwrapped);
+      }
+    });
+
+    it(`[inspect_err(x => console.log(x))] should ${
+      isOk ? 'not log' : `log ${error}`
+    }`, () => {
+      const fn = jest.fn();
+      result.inspect_err(fn);
+      expect(fn).toHaveBeenCalledTimes(isOk ? 0 : 1);
+
+      if (!isOk) {
+        expect(fn).toHaveBeenCalledWith(error);
+      }
+    });
+
     it(`should stringify to ${stringified}`, () => {
       expect(String(result)).toBe(String(stringified));
+    });
+
+    it(`should itrerate over the value`, () => {
+      const fn = jest.fn();
+
+      for (const value of result.iter()) {
+        fn(value);
+      }
+
+      expect(fn).toHaveBeenCalledTimes(1);
     });
   });
 });
