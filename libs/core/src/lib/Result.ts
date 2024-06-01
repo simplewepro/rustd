@@ -44,7 +44,7 @@ abstract class ResultBase<T, E> {
    *
    * @returns `boolean`
    */
-  public abstract isOk(): this is Ok<T>;
+  public abstract is_ok(): this is Ok<T>;
 
   /**
    * A method that returns true if the result is `Ok` (contains a value) and the predicate returns `true`, `false` otherwise
@@ -54,7 +54,7 @@ abstract class ResultBase<T, E> {
    * @param   predicate - a function that takes the value and returns a boolean
    * @returns `boolean`
    */
-  public abstract isOkAnd(predicate: (value: T) => boolean): this is Ok<T>;
+  public abstract is_ok_and(predicate: (value: T) => boolean): this is Ok<T>;
 
   /**
    * A method that returns `true` if the result is `Err` (contains an error), otherwise `false`
@@ -63,7 +63,7 @@ abstract class ResultBase<T, E> {
    *
    * @returns `boolean`
    */
-  public abstract isErr(): this is Err<E>;
+  public abstract is_err(): this is Err<E>;
 
   /**
    * A method that returns `true` if the result is `Err` (contains an error) and the _predicate_ returns `true`, otherwise `false`
@@ -73,7 +73,7 @@ abstract class ResultBase<T, E> {
    * @param predicate - a function that takes the error and returns a boolean
    * @returns `boolean`
    */
-  public abstract isErrAnd(predicate: (error: E) => boolean): this is Err<E>;
+  public abstract is_err_and(predicate: (error: E) => boolean): this is Err<E>;
 
   /**
    * A method that turns a `Result<T, E>` into an `Option<T>`
@@ -172,7 +172,25 @@ abstract class ResultBase<T, E> {
   /**
    * A method that returns `result` if the result is `Ok`, otherwise returns `Err(error)`
    */
-  public abstract and<U>(result: Result<U, E>): Result<U, E>;
+  // public abstract and<U>(result: Result<U, E>): Result<U, E>;
+
+  /**
+   * A method that calls `callbackFn` if the result is `Ok`, otherwise returns `Err(error)`
+   */
+  public abstract and_then<U>(
+    callbackFn: (value: T) => Result<U, E>
+  ): Result<U, E>;
+
+  /**
+   * A method that returns `res` if the result is `Err`, otherwise returns `Ok(value)`
+   */
+  public or<F>(result: Result<T, F>): Result<T, F> {
+    if (this.is_ok()) {
+      return this;
+    }
+
+    return result;
+  }
 
   /**
    * A method that returns an iterator over the possibly contained value.
@@ -211,11 +229,11 @@ export class Ok<T> extends ResultBase<T, never> {
     return new Some(this._value);
   }
 
-  public override isOk(): this is Ok<T> {
+  public override is_ok(): this is Ok<T> {
     return true;
   }
 
-  public override isOkAnd(predicate: (value: T) => boolean): this is Ok<T> {
+  public override is_ok_and(predicate: (value: T) => boolean): this is Ok<T> {
     return predicate(this._value);
   }
 
@@ -223,11 +241,11 @@ export class Ok<T> extends ResultBase<T, never> {
     return new None();
   }
 
-  public override isErr(): this is Err<never> {
+  public override is_err(): this is Err<never> {
     return false;
   }
 
-  public override isErrAnd(): this is Err<never> {
+  public override is_err_and(): this is Err<never> {
     return false;
   }
 
@@ -272,8 +290,14 @@ export class Ok<T> extends ResultBase<T, never> {
     throw new Error(`${this._value}`);
   }
 
-  public override and<U, E>(result: Result<U, E>): Result<U, E> {
-    return result;
+  public override and_then<U, E>(
+    callbackFn: (value: T) => Result<U, E>
+  ): Result<U, E> {
+    return callbackFn(this._value);
+  }
+
+  public override or<F>(): Result<T, F> {
+    return this;
   }
 
   override toString(): string {
@@ -300,11 +324,11 @@ export class Err<E> extends ResultBase<never, E> {
     return new None();
   }
 
-  public override isOk(): this is Ok<never> {
+  public override is_ok(): this is Ok<never> {
     return false;
   }
 
-  public override isOkAnd(): this is Ok<never> {
+  public override is_ok_and(): this is Ok<never> {
     return false;
   }
 
@@ -312,11 +336,11 @@ export class Err<E> extends ResultBase<never, E> {
     return new Some(this._value);
   }
 
-  public override isErr(): this is Err<E> {
+  public override is_err(): this is Err<E> {
     return true;
   }
 
-  public override isErrAnd(predicate: (error: E) => boolean): this is Err<E> {
+  public override is_err_and(predicate: (error: E) => boolean): this is Err<E> {
     return predicate(this._value);
   }
 
@@ -358,8 +382,7 @@ export class Err<E> extends ResultBase<never, E> {
     return this._value;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override and<U, _E2>(): Result<U, E> {
+  public override and_then<U>(): Result<U, E> {
     return this;
   }
 

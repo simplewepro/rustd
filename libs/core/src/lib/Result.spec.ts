@@ -27,7 +27,7 @@ describe('Result tests', () => {
     });
 
     it(`[isOk] should be "${isOk}"`, () => {
-      expect(result.isOk()).toBe(isOk);
+      expect(result.is_ok()).toBe(isOk);
     });
 
     const positivePredicate = <T>(value: T) => isOk && value === unwrapped;
@@ -35,7 +35,7 @@ describe('Result tests', () => {
     it(`[isOkAnd(positive predicate)] should be "${positivePredicate(
       unwrapped
     )}"`, () => {
-      expect(result.isOkAnd(positivePredicate)).toBe(
+      expect(result.is_ok_and(positivePredicate)).toBe(
         positivePredicate(unwrapped)
       );
     });
@@ -45,13 +45,13 @@ describe('Result tests', () => {
     it(`[isOkAnd(negative predicate)] should be "${negativePredicate(
       unwrapped
     )}"`, () => {
-      expect(result.isOkAnd(negativePredicate)).toBe(
+      expect(result.is_ok_and(negativePredicate)).toBe(
         negativePredicate(unwrapped)
       );
     });
 
     it(`[isErr] should be "${!isOk}"`, () => {
-      expect(result.isErr()).toBe(!isOk);
+      expect(result.is_err()).toBe(!isOk);
     });
 
     //  TODO: dont like manual predicate, in case of adding new test cases we will need to manually add new predicate option
@@ -61,7 +61,7 @@ describe('Result tests', () => {
     it(`[isErrAnd(positive predicate)] should be "${errorPredicate(
       error
     )}"`, () => {
-      expect(result.isErrAnd(errorPredicate)).toBe(errorPredicate(error));
+      expect(result.is_err_and(errorPredicate)).toBe(errorPredicate(error));
     });
 
     it(`[ok()] should be ${isOk ? `Some(${unwrapped})` : 'None'}`, () => {
