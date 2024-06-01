@@ -172,7 +172,31 @@ abstract class ResultBase<T, E> {
   /**
    * A method that returns `result` if the result is `Ok`, otherwise returns `Err(error)`
    */
-  public abstract and<U>(result: Result<U, E>): Result<U, E>;
+  public and<U>(result: Result<U, E>): Result<U, E> {
+    if (this.isErr()) {
+      return new Err(this._value);
+    }
+
+    return result;
+  }
+
+  /**
+   * A method that calls `callbackFn` if the result is `Ok`, otherwise returns `Err(error)`
+   */
+  public abstract and_then<U>(
+    callbackFn: (value: T) => Result<U, E>
+  ): Result<U, E>;
+
+  /**
+   * A method that returns `res` if the result is `Err`, otherwise returns `Ok(value)`
+   */
+  public or<F>(result: Result<T, F>): Result<T, F> {
+    if (this.isOk()) {
+      return this;
+    }
+
+    return result;
+  }
 
   /**
    * A method that returns an iterator over the possibly contained value.
@@ -272,8 +296,14 @@ export class Ok<T> extends ResultBase<T, never> {
     throw new Error(`${this._value}`);
   }
 
-  public override and<U, E>(result: Result<U, E>): Result<U, E> {
-    return result;
+  public override and_then<U, E>(
+    callbackFn: (value: T) => Result<U, E>
+  ): Result<U, E> {
+    return callbackFn(this._value);
+  }
+
+  public override or<F>(): Result<T, F> {
+    return this;
   }
 
   override toString(): string {
@@ -358,8 +388,7 @@ export class Err<E> extends ResultBase<never, E> {
     return this._value;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override and<U, _E2>(): Result<U, E> {
+  public override and_then<U>(): Result<U, E> {
     return this;
   }
 
