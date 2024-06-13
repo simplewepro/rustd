@@ -1,7 +1,7 @@
 import { inspect } from 'util';
 import { None, Option, Some } from './Option';
 
-export type Result<T, E> = Ok<T> | Err<E>;
+export type Result<T, E> = Ok<T, E> | Err<T, E>;
 
 export enum ResultType {
   Ok,
@@ -12,7 +12,9 @@ abstract class ResultBase<T, E> {
   /**
    * @type {ResultType} Ok | Err
    */
-  abstract type: ResultType;
+  protected abstract type: ResultType;
+
+  // protected abstract _value: T | E;
 
   constructor(protected _value: T | E) {}
 
@@ -22,7 +24,14 @@ abstract class ResultBase<T, E> {
    * @returns {T} the `T` if the result is `Ok`, throws an error otherwise
    * @throws {E} the error if the result is `Err`
    */
-  public abstract unwrap(): T | never;
+  public unwrap(): T | never {
+    switch (this.type) {
+      case ResultType.Ok:
+        return this.unwrap();
+      case ResultType.Err:
+        throw new Error(`${this._value}`);
+    }
+  }
 
   /**
    * A method that returns the contained `Ok` value, if any, otherwise returns the provided `defaultVal`
@@ -30,12 +39,26 @@ abstract class ResultBase<T, E> {
    * @param  {T} defaultVal
    * @returns {T}
    */
-  public abstract unwrap_or(defaultVal: T): T;
+  public unwrap_or(defaultVal: T): T {
+    switch (this.type) {
+      case ResultType.Ok:
+        return this.unwrap();
+      case ResultType.Err:
+        return defaultVal;
+    }
+  }
 
   /**
    * A method that returns the contained `Ok` value, if any, otherwise calls `callbackFn` and returns the result
    */
-  public abstract unwrap_or_else(callbackFn: (error: E) => T): T;
+  public unwrap_or_else(callbackFn: (error: E) => T): T {
+    switch (this.type) {
+      case ResultType.Ok:
+        return this.unwrap();
+      case ResultType.Err:
+        return callbackFn(this.err().unwrap());
+    }
+  }
 
   /**
    * A method that returns `true` if the result is `Ok` (contains a value), otherwise `false`
@@ -44,7 +67,9 @@ abstract class ResultBase<T, E> {
    *
    * @returns `boolean`
    */
-  public abstract isOk(): this is Ok<T>;
+  public isOk(): this is Ok<T, E> {
+    return this.type === ResultType.Ok;
+  }
 
   /**
    * A method that returns true if the result is `Ok` (contains a value) and the predicate returns `true`, `false` otherwise
@@ -54,7 +79,9 @@ abstract class ResultBase<T, E> {
    * @param   predicate - a function that takes the value and returns a boolean
    * @returns `boolean`
    */
-  public abstract isOkAnd(predicate: (value: T) => boolean): this is Ok<T>;
+  public isOkAnd(predicate: (value: T) => boolean): this is Ok<T, E> {
+    return this.isOk() && predicate(this.unwrap());
+  }
 
   /**
    * A method that returns `true` if the result is `Err` (contains an error), otherwise `false`
@@ -63,7 +90,9 @@ abstract class ResultBase<T, E> {
    *
    * @returns `boolean`
    */
-  public abstract isErr(): this is Err<E>;
+  public isErr(): this is Err<T, E> {
+    return this.type === ResultType.Err;
+  }
 
   /**
    * A method that returns `true` if the result is `Err` (contains an error) and the _predicate_ returns `true`, otherwise `false`
@@ -73,7 +102,9 @@ abstract class ResultBase<T, E> {
    * @param predicate - a function that takes the error and returns a boolean
    * @returns `boolean`
    */
-  public abstract isErrAnd(predicate: (error: E) => boolean): this is Err<E>;
+  public isErrAnd(predicate: (error: E) => boolean): this is Err<T, E> {
+    return this.isErr() && predicate(this.err().unwrap());
+  }
 
   /**
    * A method that turns a `Result<T, E>` into an `Option<T>`
@@ -84,7 +115,14 @@ abstract class ResultBase<T, E> {
    *
    * @returns `Option`
    */
-  public abstract ok(): Option<T>;
+  public ok(): Option<T> {
+    switch (this.type) {
+      case ResultType.Ok:
+        return new Some(this.unwrap());
+      case ResultType.Err:
+        return new None();
+    }
+  }
 
   /**
    * A method that turns a `Result<T, E>` into an `Option<E>`
@@ -95,7 +133,14 @@ abstract class ResultBase<T, E> {
    *
    * @returns `Option`
    */
-  public abstract err(): Option<E>;
+  public err(): Option<E> {
+    switch (this.type) {
+      case ResultType.Ok:
+        return new None();
+      case ResultType.Err:
+        return new Some(this.err().unwrap());
+    }
+  }
 
   /**
    * A method maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value, leaving an `Err` value untouched.
@@ -103,7 +148,14 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns `Result<U, E>`
    */
-  public abstract map<U>(callbackFn: (value: T) => U): Result<U, E>;
+  public map<U>(callbackFn: (value: T) => U): Result<U, E> {
+    switch (this.type) {
+      case ResultType.Ok:
+        return new Ok<U, E>(callbackFn(this.unwrap()));
+      case ResultType.Err:
+        return new Err<U, E>(this.err().unwrap());
+    }
+  }
 
   /**
    * A method returns the provided default (if `Err`) or applies the provided function (if `Ok`) to value and returns the result
@@ -111,7 +163,14 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns
    */
-  public abstract map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U;
+  public map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U {
+    switch (this.type) {
+      case ResultType.Ok:
+        return callbackFn(this.unwrap());
+      case ResultType.Err:
+        return defaultVal;
+    }
+  }
 
   /**
    * A method that maps a `Result<T, E>` to `U` by applying a function to a contained `Ok` value, or a fallback function to a contained `Err` value.
@@ -120,10 +179,17 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the value `T` and returns a new value `U`
    * @returns
    */
-  public abstract map_or_else<U>(
+  public map_or_else<U>(
     errCallbackFn: (error: E) => U,
     callbackFn: (value: T) => U
-  ): U;
+  ): U {
+    switch (this.type) {
+      case ResultType.Ok:
+        return callbackFn(this.unwrap());
+      case ResultType.Err:
+        return errCallbackFn(this.err().unwrap());
+    }
+  }
 
   /**
    * A method that maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value, leaving an `Ok` value untouched.
@@ -133,7 +199,14 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a function that takes the error `E` and returns a new error `F`
    * @returns Result<T, F>
    */
-  public abstract map_err<F>(callbackFn: (error: E) => F): Result<T, F>;
+  public map_err<F>(callbackFn: (error: E) => F): Result<T, F> {
+    switch (this.type) {
+      case ResultType.Ok:
+        return new Ok<T, F>(this.unwrap());
+      case ResultType.Err:
+        return new Err<T, F>(callbackFn(this.err().unwrap()));
+    }
+  }
 
   /**
    * A method that calls `callbackFn` with contained value if the result is `Ok`
@@ -141,7 +214,13 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a callback function to be called with contained value if `Ok`
    * @returns {this} `this`
    */
-  public abstract inspect(callbackFn: (value: T) => void): this;
+  public inspect(callbackFn: (value: T) => void): this {
+    if (this.isOk()) {
+      callbackFn(this.unwrap());
+    }
+
+    return this;
+  }
 
   /**
    * A method that calls `callbackFn` with contained error if the result is `Err`
@@ -149,7 +228,13 @@ abstract class ResultBase<T, E> {
    * @param callbackFn - a callback function to be called with contained error if `Err`
    * @returns {this} `this`
    */
-  public abstract inspect_err(callbackFn: (error: E) => void): this;
+  public inspect_err(callbackFn: (error: E) => void): this {
+    if (this.isErr()) {
+      callbackFn(this.err().unwrap());
+    }
+
+    return this;
+  }
 
   /**
    * A method, that if the result is `Ok`, returns the contained value, otherwise throws an error with the provided `message`
@@ -157,45 +242,73 @@ abstract class ResultBase<T, E> {
    * @param  {string} message
    * @returns `T`
    */
-  public abstract expect(message: string): T | never;
+  public expect(message: string): T | never {
+    switch (this.type) {
+      case ResultType.Ok:
+        return this.unwrap();
+      case ResultType.Err:
+        throw new Error(`${message}: ${this._value}`);
+    }
+  }
 
   /**
    * A method, that if the result is `Err`, returns the contained value, otherwise throws an error with the provided `message`
    */
-  public abstract expect_err(message: string): E | never;
+  public expect_err(message: string): E | never {
+    switch (this.type) {
+      case ResultType.Ok:
+        throw new Error(`${message}: ${this._value}`);
+      case ResultType.Err:
+        return this.err().unwrap();
+    }
+  }
 
   /**
    * A method, that if the result is `Err`, returns the contained error value, otherwise throws an error with contained value
    */
-  public abstract unwrap_err(): E | never;
+  public unwrap_err(): E | never {
+    switch (this.type) {
+      case ResultType.Ok:
+        throw new Error(`${this._value}`);
+      case ResultType.Err:
+        return this.err().unwrap();
+    }
+  }
 
   /**
    * A method that returns `result` if the result is `Ok`, otherwise returns `Err(error)`
    */
   public and<U>(result: Result<U, E>): Result<U, E> {
-    if (this.isErr()) {
-      return new Err(this._value);
+    switch (this.type) {
+      case ResultType.Ok:
+        return result;
+      case ResultType.Err:
+        return new Err<U, E>(this.err().unwrap());
     }
-
-    return result;
   }
 
   /**
-   * A method that calls `callbackFn` if the result is `Ok`, otherwise returns `Err(error)`
+   * A method that maps value to `callbackFn` if the result is `Ok`, otherwise returns `Err(error)`
    */
-  public abstract and_then<U>(
-    callbackFn: (value: T) => Result<U, E>
-  ): Result<U, E>;
+  public and_then<U>(callbackFn: (value: T) => Result<U, E>): Result<U, E> {
+    switch (this.type) {
+      case ResultType.Ok:
+        return callbackFn(this.unwrap());
+      case ResultType.Err:
+        return new Err<U, E>(this.err().unwrap());
+    }
+  }
 
   /**
    * A method that returns `res` if the result is `Err`, otherwise returns `Ok(value)`
    */
   public or<F>(result: Result<T, F>): Result<T, F> {
-    if (this.isOk()) {
-      return this;
+    switch (this.type) {
+      case ResultType.Ok:
+        return new Ok<T, F>(this.unwrap());
+      case ResultType.Err:
+        return result;
     }
-
-    return result;
   }
 
   /**
@@ -216,94 +329,11 @@ abstract class ResultBase<T, E> {
   }
 }
 
-export class Ok<T> extends ResultBase<T, never> {
+export class Ok<T, E> extends ResultBase<T, E> {
   type = ResultType.Ok;
 
-  public override unwrap(): T {
-    return this._value;
-  }
-
-  public override unwrap_or(): T {
-    return this._value;
-  }
-
-  public override unwrap_or_else(): T {
-    return this._value;
-  }
-
-  public override ok(): Option<T> {
-    return new Some(this._value);
-  }
-
-  public override isOk(): this is Ok<T> {
-    return true;
-  }
-
-  public override isOkAnd(predicate: (value: T) => boolean): this is Ok<T> {
-    return predicate(this._value);
-  }
-
-  public override err(): Option<never> {
-    return new None();
-  }
-
-  public override isErr(): this is Err<never> {
-    return false;
-  }
-
-  public override isErrAnd(): this is Err<never> {
-    return false;
-  }
-
-  public override map<U>(callbackFn: (value: T) => U): Result<U, never> {
-    return new Ok(callbackFn(this._value));
-  }
-
-  public override map_or<U>(defaultVal: U, callbackFn: (value: T) => U): U {
-    return callbackFn(this._value);
-  }
-
-  public override map_or_else<U>(
-    _errCallbackFn: (error: never) => U,
-    callbackFn: (value: T) => U
-  ): U {
-    return callbackFn(this._value);
-  }
-
-  public override map_err<F>(): Result<T, F> {
-    return new Ok<T>(this._value);
-  }
-
-  public override inspect(callbackFn: (value: T) => void): this {
-    callbackFn(this._value);
-
-    return this;
-  }
-
-  public override inspect_err(): this {
-    return this;
-  }
-
-  public override expect(): T {
-    return this._value;
-  }
-
-  public override expect_err(message: string): never {
-    throw new Error(`${message}: ${this._value}`);
-  }
-
-  public override unwrap_err(): never {
-    throw new Error(`${this._value}`);
-  }
-
-  public override and_then<U, E>(
-    callbackFn: (value: T) => Result<U, E>
-  ): Result<U, E> {
-    return callbackFn(this._value);
-  }
-
-  public override or<F>(): Result<T, F> {
-    return this;
+  constructor(value: T) {
+    super(value);
   }
 
   override toString(): string {
@@ -311,85 +341,11 @@ export class Ok<T> extends ResultBase<T, never> {
   }
 }
 
-export class Err<E> extends ResultBase<never, E> {
+export class Err<T, E> extends ResultBase<T, E> {
   type = ResultType.Err;
 
-  public override unwrap(): never {
-    throw new Error(`${this._value}`);
-  }
-
-  public override unwrap_or<T>(defaultVal: T): T {
-    return defaultVal;
-  }
-
-  public override unwrap_or_else<T>(callbackFn: (error: E) => T): T {
-    return callbackFn(this._value);
-  }
-
-  public override ok(): Option<never> {
-    return new None();
-  }
-
-  public override isOk(): this is Ok<never> {
-    return false;
-  }
-
-  public override isOkAnd(): this is Ok<never> {
-    return false;
-  }
-
-  public override err(): Option<E> {
-    return new Some(this._value);
-  }
-
-  public override isErr(): this is Err<E> {
-    return true;
-  }
-
-  public override isErrAnd(predicate: (error: E) => boolean): this is Err<E> {
-    return predicate(this._value);
-  }
-
-  public override map<U>(): Result<U, E> {
-    return this;
-  }
-
-  public override map_or<U>(defaultVal: U): U {
-    return defaultVal;
-  }
-
-  public override map_or_else<U>(errCallbackFn: (error: E) => U): U {
-    return errCallbackFn(this._value);
-  }
-
-  public override map_err<F>(callbackFn: (error: E) => F): Result<never, F> {
-    return new Err(callbackFn(this._value));
-  }
-
-  public override inspect(): this {
-    return this;
-  }
-
-  public override inspect_err(callbackFn: (error: E) => void): this {
-    callbackFn(this._value);
-
-    return this;
-  }
-
-  public override expect(message: string): never {
-    throw new Error(`${message}: ${this._value}`);
-  }
-
-  public override expect_err(): E {
-    return this._value;
-  }
-
-  public override unwrap_err(): E {
-    return this._value;
-  }
-
-  public override and_then<U>(): Result<U, E> {
-    return this;
+  constructor(value: E) {
+    super(value);
   }
 
   toString(): string {

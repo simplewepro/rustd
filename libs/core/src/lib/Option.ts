@@ -7,7 +7,7 @@ export enum OptionType {
   None,
 }
 
-abstract class OptionBase<T = undefined> {
+abstract class OptionBase<T = unknown> {
   abstract type: OptionType;
 
   abstract unwrap(): T;

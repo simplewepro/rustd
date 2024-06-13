@@ -1,44 +1,27 @@
-import { None, Option, Some } from './Option';
 import { Result, Err, Ok } from './Result';
 
-const giveResult = (value: number): Result<number, { code: number }> => {
+const giveResult = (value: number): Result<number, string> => {
   if (value > 0) {
     return new Ok(value);
   } else {
-    return new Err({ code: 430 });
+    return new Err('error one');
   }
 };
 
-interface Data {
-  some: string;
-}
+const result = giveResult(1);
+const result2 = giveResult(0);
+const a = new Err<number, string>('error');
+const b = new Ok<number, string>(2);
 
-interface FetchError {
-  reason: string;
-  data: any;
-}
+const wrapped = result.and(a);
+const wrapped2 = result.and(b);
+const wrapped3 = result.and(result2);
 
-const fetchSomeData = (): Result<Data, FetchError> => {
-  try {
-    const data = fetch('https://api.example.com');
-    return new Ok(data);
-  } catch (error) {
-    return new Err(error);
-  }
-};
+const wrapped4 = a.and(b);
+const wrapped5 = a.ok();
 
-const data = fetchSomeData();
-
-// const result2 = giveResult(1);
-// const a = new Err('error');
-// const b = new Ok(2);
-
-// const wrapped = result.and(a);
-// const wrapped2 = result.and(b);
-// const wrapped3 = result.and(result2)
-
-// a.and(b);
-// b.and(a);
-
-// console.log(wrapped);
-// console.log(wrapped2);
+console.log(wrapped);
+console.log(wrapped2);
+console.log(wrapped3);
+console.log(wrapped4);
+console.log(wrapped5);

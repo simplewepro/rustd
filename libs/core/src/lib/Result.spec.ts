@@ -4,9 +4,9 @@ import { Err, Ok, ResultType } from './Result';
 
 describe('Result tests', () => {
   describe.each([
-    [new Ok(1), ResultType.Ok, true, 1, null, 'Ok(1)'],
+    [new Ok<number, string>(1), ResultType.Ok, true, 1, null, 'Ok(1)'],
     [
-      new Err('Expected'),
+      new Err<number, string>('Expected'),
       ResultType.Err,
       false,
       null,
@@ -14,7 +14,7 @@ describe('Result tests', () => {
       'Err(Expected)',
     ],
     [
-      new Err(new Error('Expected nested')),
+      new Err<number, Error>(new Error('Expected nested')),
       ResultType.Err,
       false,
       null,
