@@ -1,6 +1,7 @@
+import { Option, None, Some } from './Option';
 import { Result, Err, Ok } from './Result';
 
-const giveResult = (value: number): Result<number, { code: number }> => {
+export const giveResult = (value: number): Result<number, { code: number }> => {
   if (value > 0) {
     return new Ok(value);
   } else {
@@ -8,6 +9,18 @@ const giveResult = (value: number): Result<number, { code: number }> => {
   }
 };
 
-const result = giveResult(1);
+export const giveOption = (value: number): Option<number> => {
+  if (value > 0) {
+    return new Some(value);
+  } else {
+    return new None();
+  }
+};
 
-console.log(result);
+const a = giveOption(1);
+
+if (a.isNone()) {
+  const b = a.unwrap();
+
+  console.log(b);
+}
