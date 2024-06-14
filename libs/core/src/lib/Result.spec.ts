@@ -27,7 +27,7 @@ describe('Result tests', () => {
     });
 
     it(`[isOk] should be "${isOk}"`, () => {
-      expect(result.is_ok()).toBe(isOk);
+      expect(result.isOk()).toBe(isOk);
     });
 
     const positivePredicate = <T>(value: T) => isOk && value === unwrapped;
@@ -35,7 +35,7 @@ describe('Result tests', () => {
     it(`[isOkAnd(positive predicate)] should be "${positivePredicate(
       unwrapped
     )}"`, () => {
-      expect(result.is_ok_and(positivePredicate)).toBe(
+      expect(result.isOkAnd(positivePredicate)).toBe(
         positivePredicate(unwrapped)
       );
     });
@@ -45,13 +45,13 @@ describe('Result tests', () => {
     it(`[isOkAnd(negative predicate)] should be "${negativePredicate(
       unwrapped
     )}"`, () => {
-      expect(result.is_ok_and(negativePredicate)).toBe(
+      expect(result.isOkAnd(negativePredicate)).toBe(
         negativePredicate(unwrapped)
       );
     });
 
     it(`[isErr] should be "${!isOk}"`, () => {
-      expect(result.is_err()).toBe(!isOk);
+      expect(result.isErr()).toBe(!isOk);
     });
 
     //  TODO: dont like manual predicate, in case of adding new test cases we will need to manually add new predicate option
@@ -61,7 +61,7 @@ describe('Result tests', () => {
     it(`[isErrAnd(positive predicate)] should be "${errorPredicate(
       error
     )}"`, () => {
-      expect(result.is_err_and(errorPredicate)).toBe(errorPredicate(error));
+      expect(result.isErrAnd(errorPredicate)).toBe(errorPredicate(error));
     });
 
     it(`[ok()] should be ${isOk ? `Some(${unwrapped})` : 'None'}`, () => {
@@ -83,11 +83,11 @@ describe('Result tests', () => {
     });
 
     it(`[unwrap_or(2)] should be ${isOk ? unwrapped : 2}`, () => {
-      expect(result.unwrap_or(2)).toBe(isOk ? unwrapped : 2);
+      expect(result.unwrapOr(2)).toBe(isOk ? unwrapped : 2);
     });
 
     it(`[unwrap_or_else(() => 2)] should be ${isOk ? unwrapped : 2}`, () => {
-      expect(result.unwrap_or_else(() => 2)).toBe(isOk ? unwrapped : 2);
+      expect(result.unwrapOrElse(() => 2)).toBe(isOk ? unwrapped : 2);
     });
 
     it(`[map(x => x + 1)] should be ${
@@ -99,7 +99,7 @@ describe('Result tests', () => {
     });
 
     it(`[map_or(0, x => x + 1)] should be ${isOk ? unwrapped! + 1 : 0}`, () => {
-      expect(result.map_or(0, (value) => value + 1)).toBe(
+      expect(result.mapOr(0, (value) => value + 1)).toBe(
         isOk ? unwrapped! + 1 : 0
       );
     });
@@ -108,7 +108,7 @@ describe('Result tests', () => {
       isOk ? unwrapped! + 1 : 0
     }`, () => {
       expect(
-        result.map_or_else(
+        result.mapOrElse(
           () => 0,
           (value) => value + 1
         )
@@ -118,7 +118,7 @@ describe('Result tests', () => {
     it(`[map_err(x => x + 1)] should be ${
       isOk ? result : new Err(error)
     }`, () => {
-      expect(result.map_err((err) => `prefix: ${err}`)).toStrictEqual(
+      expect(result.mapErr((err) => `prefix: ${err}`)).toStrictEqual(
         isOk ? result : new Err(`prefix: ${error}`)
       );
     });
@@ -137,19 +137,19 @@ describe('Result tests', () => {
       isOk ? 'throw' : `throw expected error: ${error}`
     }`, () => {
       if (isOk) {
-        expect(() => result.expect_err('expected error')).toThrow(
+        expect(() => result.expectErr('expected error')).toThrow(
           `expected error: ${unwrapped}`
         );
       } else {
-        expect(result.expect_err('expected error')).toStrictEqual(error);
+        expect(result.expectErr('expected error')).toStrictEqual(error);
       }
     });
 
     it(`[unwrap_err()] should ${isOk ? 'throw' : `be ${error}`}`, () => {
       if (isOk) {
-        expect(() => result.unwrap_err()).toThrow(new Error(String(unwrapped)));
+        expect(() => result.unwrapErr()).toThrow(new Error(String(unwrapped)));
       } else {
-        expect(result.unwrap_err()).toStrictEqual(error);
+        expect(result.unwrapErr()).toStrictEqual(error);
       }
     });
 
@@ -169,7 +169,7 @@ describe('Result tests', () => {
       isOk ? 'not log' : `log ${error}`
     }`, () => {
       const fn = jest.fn();
-      result.inspect_err(fn);
+      result.inspectErr(fn);
       expect(fn).toHaveBeenCalledTimes(isOk ? 0 : 1);
 
       if (!isOk) {
