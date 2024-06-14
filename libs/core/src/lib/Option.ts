@@ -74,29 +74,29 @@ abstract class OptionBase<T> {
   /**
    * Returns the contained value or computes it from a closure
    *
-   * @param {function} callback the closure to compute the value from
+   * @param {function} def the closure to compute the value from
    * @returns {T}
    */
-  public abstract unwrapOrElse(callback: () => T): T;
+  public abstract unwrapOrElse(def: () => T): T;
 
   /**
    * Maps an `Option<T>` to `Option<U>` by applying a function
    * to a contained value (if `Some`) or return `None`
    *
-   * @param {function} val_callback the function to apply to the value
+   * @param {function} val the function to apply to the value
    * @returns {Option<U>}
    */
-  public abstract map<U>(val_callback: (value: T) => U): Option<U>;
+  public abstract map<U>(val: (value: T) => U): Option<U>;
 
   /**
    * Maps an `Option<T>` to `U` by applying a function to a contained value (if `Some`)
    * or return a provided default value
    *
    * @param {U} def the default value to return if the option is `None`
-   * @param {function} val_callback the function to apply to the value
+   * @param {function} val the function to apply to the value
    * @returns {U}
    */
-  public abstract mapOr<U>(def: U, val_callback: (value: T) => U): U;
+  public abstract mapOr<U>(def: U, val: (value: T) => U): U;
 
   /**
    * Maps an `Option<T>` to `U` by applying a function to a contained value (if `Some`)
@@ -106,18 +106,15 @@ abstract class OptionBase<T> {
    * @param {function} g the closure to compute the default value from
    * @returns {U}
    */
-  public abstract mapOrElse<U>(
-    def_callback: () => U,
-    val_callback: (value: T) => U
-  ): U;
+  public abstract mapOrElse<U>(def: () => U, val: (value: T) => U): U;
 
   /**
    * A method that calls `callbackFn` with contained value if the option is `Some`
    *
-   * @param callback - a callback function to be called with contained value
+   * @param val - a callback function to be called with contained value
    * @returns {this} `this`
    */
-  public abstract inspect(callback: (value: T) => void): this;
+  public abstract inspect(val: (value: T) => void): this;
 
   /**
    * Transforms the `Option<T>` into a `Result<T, E>`
@@ -146,10 +143,10 @@ abstract class OptionBase<T> {
   /**
    * Returns `None` if the option is `None`, otherwise calls `callback` with the wrapped value and returns the result
    *
-   * @param {function} callback the function to call with the wrapped value
+   * @param {function} val the function to call with the wrapped value
    * @returns {Option<U>}
    */
-  public abstract andThen<U>(callback: (value: T) => Option<U>): Option<U>;
+  public abstract andThen<U>(val: (value: T) => Option<U>): Option<U>;
 
   /**
    * Returns `None` if the option is `None`, otherwise calls `predicate` with the wrapped value and returns:
@@ -162,7 +159,7 @@ abstract class OptionBase<T> {
   public abstract filter(predicate: (value: T) => boolean): Option<T>;
 
   /**
-   * Returns the option if it contains a value, otherwise returns `optb`
+   * Returns the `Option` if it contains a value, otherwise returns `optb`
    *
    * @param {Option<T>} optb the option to return if the option is `None`
    * @returns {Option<T>} `Option`
@@ -170,7 +167,7 @@ abstract class OptionBase<T> {
   public abstract or(optb: Option<T>): Option<T>;
 
   /**
-   * Returns the option if it contains a value, otherwise calls `f` and returns the result
+   * Returns the option if it contains a value, otherwise calls `callback` and returns the result
    *
    * @param {function} callback the function to call if the option is `None`
    * @returns {Option<T>} `Option`
@@ -203,12 +200,12 @@ abstract class OptionBase<T> {
   public abstract getOrInsert(def: T): T;
 
   /**
-   * Inserts a value computed from `f` into the option if it is `None`, then returns the contained value
+   * Inserts a value computed from `def` into the option if it is `None`, then returns the contained value
    *
-   * @param {function} callback the closure to compute the value from
+   * @param {function} def the closure to compute the value from
    * @returns {T} `value`
    */
-  public abstract getOrInsertWith(callback: () => T): T;
+  public abstract getOrInsertWith(def: () => T): T;
 
   /**
    * Takes the value out of the option, leaving a None in its place.
@@ -272,24 +269,21 @@ export class Some<T> extends OptionBase<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override unwrapOrElse(_f: () => T): T {
+  public override unwrapOrElse(_def: () => T): T {
     return this._value;
   }
 
-  public override map<U>(val_callback: (value: T) => U): Option<U> {
-    return new Some(val_callback(this._value));
+  public override map<U>(val: (value: T) => U): Option<U> {
+    return new Some(val(this._value));
   }
 
-  public override mapOr<U>(_def: U, val_callback: (value: T) => U): U {
-    return val_callback(this._value);
+  public override mapOr<U>(_def: U, val: (value: T) => U): U {
+    return val(this._value);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override mapOrElse<U>(
-    _def_callback: () => U,
-    val_callback: (value: T) => U
-  ): U {
-    return val_callback(this._value);
+  public override mapOrElse<U>(_def: () => U, val: (value: T) => U): U {
+    return val(this._value);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -306,8 +300,8 @@ export class Some<T> extends OptionBase<T> {
     return optb;
   }
 
-  public override andThen<U>(callback: (value: T) => Option<U>): Option<U> {
-    return callback(this._value);
+  public override andThen<U>(val: (value: T) => Option<U>): Option<U> {
+    return val(this._value);
   }
 
   public override filter(predicate: (value: T) => boolean): Option<T> {
@@ -320,7 +314,7 @@ export class Some<T> extends OptionBase<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override orElse(_callback: () => Option<T>): Option<T> {
+  public override orElse(_def: () => Option<T>): Option<T> {
     return this;
   }
 
@@ -340,7 +334,7 @@ export class Some<T> extends OptionBase<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override getOrInsertWith(_f: () => T): T {
+  public override getOrInsertWith(_def: () => T): T {
     return this._value;
   }
 
@@ -348,7 +342,7 @@ export class Some<T> extends OptionBase<T> {
     const old_value = this._value;
 
     // TODO: double check this approach
-    Object.setPrototypeOf(this, None);
+    Object.setPrototypeOf(this, new None());
     this._type = OptionType.None;
     (this._value as unknown) = undefined;
 
@@ -360,7 +354,7 @@ export class Some<T> extends OptionBase<T> {
       return this.take();
     }
 
-    return this;
+    return new None();
   }
 
   public override replace(value: T): Option<T> {
@@ -418,19 +412,19 @@ export class None<T = unknown> extends OptionBase<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override map<U>(_f: (value: T) => U) {
+  public override map<U>(_val: (value: T) => U) {
     return this;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override mapOr<U>(def: U, _val_callback: (value: T) => U): U {
+  public override mapOr<U>(def: U, _val: (value: T) => U): U {
     return def;
   }
 
   public override mapOrElse<U>(
     def_callback: () => U,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _val_callback: (value: T) => U
+    _val: (value: T) => U
   ): U {
     return def_callback();
   }
@@ -449,7 +443,7 @@ export class None<T = unknown> extends OptionBase<T> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override andThen<U>(_callback: (value: T) => Option<U>): Option<U> {
+  public override andThen<U>(_def: (value: T) => Option<U>): Option<U> {
     return this;
   }
 
@@ -473,7 +467,7 @@ export class None<T = unknown> extends OptionBase<T> {
 
   // TODO: unchecked; needs additional testing
   public override insert(value: T): T {
-    Object.setPrototypeOf(this, Some);
+    Object.setPrototypeOf(this, new Some(value));
 
     this._type = OptionType.Some;
     this._value = value;
@@ -485,8 +479,8 @@ export class None<T = unknown> extends OptionBase<T> {
     return this.insert(def);
   }
 
-  public override getOrInsertWith(callback: () => T): T {
-    return this.insert(callback());
+  public override getOrInsertWith(def: () => T): T {
+    return this.insert(def());
   }
 
   public override take(): Option<T> {
