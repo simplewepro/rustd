@@ -238,7 +238,7 @@ export class Ok<T, E> extends ResultBase<T, E> {
     return new None();
   }
 
-  public override isErr(): this is Err<T, never> {
+  public override isErr(): this is Err<T, E> {
     return false;
   }
 
@@ -324,7 +324,7 @@ export class Err<T, E> extends ResultBase<T, E> {
     return new None();
   }
 
-  public override isOk(): this is Ok<never, E> {
+  public override isOk(): this is Ok<T, E> {
     return false;
   }
 
