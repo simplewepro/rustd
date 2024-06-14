@@ -3,192 +3,241 @@ import { None, Some } from './Option';
 import { Err, Ok, ResultType } from './Result';
 
 describe('Result tests', () => {
-  describe.each([
-    [new Ok(1), ResultType.Ok, true, 1, null, 'Ok(1)'],
-    [
-      new Err('Expected'),
-      ResultType.Err,
-      false,
-      null,
-      'Expected',
-      'Err(Expected)',
-    ],
-    [
-      new Err(new Error('Expected nested')),
-      ResultType.Err,
-      false,
-      null,
-      new Error('Expected nested'),
-      'Err(Error: Expected nested)',
-    ],
-  ])('Result %s', (result, type, isOk, unwrapped, error, stringified) => {
-    it(`[type] should be "${ResultType[type]}"`, () => {
-      expect(result.type).toBe(type);
-    });
+  test('[type] should be correct', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[isOk] should be "${isOk}"`, () => {
-      expect(result.isOk()).toBe(isOk);
-    });
+    expect(ok.type).toBe(ResultType.Ok);
+    expect(err.type).toBe(ResultType.Err);
+  });
 
-    const positivePredicate = <T>(value: T) => isOk && value === unwrapped;
+  test('[isOk] should be work properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[isOkAnd(positive predicate)] should be "${positivePredicate(
-      unwrapped
-    )}"`, () => {
-      expect(result.isOkAnd(positivePredicate)).toBe(
-        positivePredicate(unwrapped)
-      );
-    });
+    expect(ok.isOk()).toBe(true);
+    expect(err.isOk()).toBe(false);
+  });
 
-    const negativePredicate = <T>(value: T) => isOk && value !== unwrapped;
+  test('[isOkAnd] should work properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[isOkAnd(negative predicate)] should be "${negativePredicate(
-      unwrapped
-    )}"`, () => {
-      expect(result.isOkAnd(negativePredicate)).toBe(
-        negativePredicate(unwrapped)
-      );
-    });
+    expect(ok.isOkAnd((value) => value === 2)).toBe(true);
+    expect(ok.isOkAnd((value) => value === 3)).toBe(false);
+    expect(err.isOkAnd((value) => value === 3)).toBe(false);
+  });
 
-    it(`[isErr] should be "${!isOk}"`, () => {
-      expect(result.isErr()).toBe(!isOk);
-    });
+  test('[isErr] should work properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    //  TODO: dont like manual predicate, in case of adding new test cases we will need to manually add new predicate option
-    const errorPredicate = <T>(err: T) =>
-      !isOk && (err === 'Expected' || err === new Error('Expected nested'));
+    expect(ok.isErr()).toBe(false);
+    expect(err.isErr()).toBe(true);
+  });
 
-    it(`[isErrAnd(positive predicate)] should be "${errorPredicate(
-      error
-    )}"`, () => {
-      expect(result.isErrAnd(errorPredicate)).toBe(errorPredicate(error));
-    });
+  test('[isErrAnd] should work properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[ok()] should be ${isOk ? `Some(${unwrapped})` : 'None'}`, () => {
-      expect(result.ok()).toStrictEqual(
-        isOk ? new Some(unwrapped) : new None()
-      );
-    });
+    expect(ok.isErrAnd((value) => value === 2)).toBe(false);
+    expect(err.isErrAnd((value) => value === 'error')).toBe(true);
+    expect(err.isErrAnd((value) => value === 'not error')).toBe(false);
+  });
 
-    it(`[err()] should be ${isOk ? 'None' : `Some(${error})`}`, () => {
-      expect(result.err()).toStrictEqual(isOk ? new None() : new Some(error));
-    });
+  test('[ok] should consume Ok<T> value to Option<T> properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[unwrap()] should ${isOk ? `be ${result}` : 'throw'}`, () => {
-      if (isOk) {
-        expect(result.unwrap()).toBe(unwrapped);
-      } else {
-        expect(() => result.unwrap()).toThrow('Expected');
-      }
-    });
+    expect(ok.ok()).toMatchObject(new Some(2));
+    expect(err.ok()).toMatchObject(new None());
+  });
 
-    it(`[unwrap_or(2)] should be ${isOk ? unwrapped : 2}`, () => {
-      expect(result.unwrapOr(2)).toBe(isOk ? unwrapped : 2);
-    });
+  test('[err] should consume Err<E> to Option<E> properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[unwrap_or_else(() => 2)] should be ${isOk ? unwrapped : 2}`, () => {
-      expect(result.unwrapOrElse(() => 2)).toBe(isOk ? unwrapped : 2);
-    });
+    expect(ok.err()).toMatchObject(new None());
+    expect(err.err()).toMatchObject(new Some('error'));
+  });
 
-    it(`[map(x => x + 1)] should be ${
-      isOk ? new Ok(unwrapped! + 1) : new Err(error)
-    }`, () => {
-      expect(result.map((value) => value + 1)).toStrictEqual(
-        isOk ? new Ok(unwrapped! + 1) : new Err(error)
-      );
-    });
+  test('[expect] should consume Ok value or throw if Err', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[map_or(0, x => x + 1)] should be ${isOk ? unwrapped! + 1 : 0}`, () => {
-      expect(result.mapOr(0, (value) => value + 1)).toBe(
-        isOk ? unwrapped! + 1 : 0
-      );
-    });
+    expect(ok.expect('error message')).toBe(2);
+    expect(() => err.expect('error message')).toThrow('error message');
+  });
 
-    it(`[map_or_else(x => x + 1, () => 0)] should be ${
-      isOk ? unwrapped! + 1 : 0
-    }`, () => {
-      expect(
-        result.mapOrElse(
-          () => 0,
-          (value) => value + 1
-        )
-      ).toBe(isOk ? unwrapped! + 1 : 0);
-    });
+  test('[unwrap] should consume Ok value or throw', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[map_err(x => x + 1)] should be ${
-      isOk ? result : new Err(error)
-    }`, () => {
-      expect(result.mapErr((err) => `prefix: ${err}`)).toStrictEqual(
-        isOk ? result : new Err(`prefix: ${error}`)
-      );
-    });
+    expect(ok.unwrap()).toBe(2);
+    expect(() => err.unwrap()).toThrow('error');
+  });
 
-    it(`[expect()] should ${
-      isOk ? `be ${unwrapped}` : 'throw expected error'
-    }`, () => {
-      if (isOk) {
-        expect(result.expect('expected error')).toBe(unwrapped);
-      } else {
-        expect(() => result.expect('expected error')).toThrow('expected error');
-      }
-    });
+  test('[unwrapOr] should consume stored Ok value or return provided default', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[expect_err('expected error')] should ${
-      isOk ? 'throw' : `throw expected error: ${error}`
-    }`, () => {
-      if (isOk) {
-        expect(() => result.expectErr('expected error')).toThrow(
-          `expected error: ${unwrapped}`
-        );
-      } else {
-        expect(result.expectErr('expected error')).toStrictEqual(error);
-      }
-    });
+    expect(ok.unwrapOr(4)).toBe(2);
+    expect(err.unwrapOr(4)).toBe(4);
+  });
 
-    it(`[unwrap_err()] should ${isOk ? 'throw' : `be ${error}`}`, () => {
-      if (isOk) {
-        expect(() => result.unwrapErr()).toThrow(new Error(String(unwrapped)));
-      } else {
-        expect(result.unwrapErr()).toStrictEqual(error);
-      }
-    });
+  test('[unwrapOrElse] should consume stored Ok value or compute provided default', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
 
-    it(`[inspect(x => console.log(x))] should ${
-      isOk ? `log ${unwrapped}` : 'not log'
-    }`, () => {
-      const fn = jest.fn();
-      result.inspect(fn);
-      expect(fn).toHaveBeenCalledTimes(isOk ? 1 : 0);
+    expect(ok.unwrapOrElse(() => 4)).toBe(2);
+    expect(err.unwrapOrElse(() => 4)).toBe(4);
+  });
 
-      if (isOk) {
-        expect(fn).toHaveBeenCalledWith(unwrapped);
-      }
-    });
+  test('[map] should compute Ok value or leave Err untouched', () => {
+    const ok = new Ok(2);
+    const err = new Err<number, string>('error');
 
-    it(`[inspect_err(x => console.log(x))] should ${
-      isOk ? 'not log' : `log ${error}`
-    }`, () => {
-      const fn = jest.fn();
-      result.inspectErr(fn);
-      expect(fn).toHaveBeenCalledTimes(isOk ? 0 : 1);
+    expect(ok.map((value) => value * 2)).toMatchObject(new Ok(4));
+    expect(err.map((value) => value * 2)).toMatchObject(new Err('error'));
+  });
 
-      if (!isOk) {
-        expect(fn).toHaveBeenCalledWith(error);
-      }
-    });
+  test('[mapOr] should compute Ok value or return provided default', () => {
+    const ok = new Ok(2);
+    const err = new Err<number, string>('error');
 
-    it(`should stringify to ${stringified}`, () => {
-      expect(String(result)).toBe(String(stringified));
-    });
+    expect(ok.mapOr(4, (value) => value * 3)).toBe(6);
+    expect(err.mapOr(4, (value) => value * 3)).toBe(4);
+  });
 
-    it(`should itrerate over the value`, () => {
-      const fn = jest.fn();
+  test('[mapOrElse] should compute Ok value or compute provided default', () => {
+    const ok = new Ok(2);
+    const err = new Err<number, string>('error');
 
-      for (const value of result.iter()) {
-        fn(value);
-      }
+    expect(
+      ok.mapOrElse(
+        () => 4,
+        (value) => value * 3
+      )
+    ).toBe(6);
+    expect(
+      err.mapOrElse(
+        () => 4,
+        (value) => value * 3
+      )
+    ).toBe(4);
+  });
 
-      expect(fn).toHaveBeenCalledTimes(1);
-    });
+  test('[mapErr] should compute Err value or leave Ok untouched', () => {
+    const ok = new Ok<number, string>(2);
+    const err = new Err<number, string>('error');
+
+    expect(ok.mapErr((value) => value + '2')).toMatchObject(new Ok(2));
+    expect(err.mapErr((value) => value + '2')).toMatchObject(new Err('error2'));
+  });
+
+  test('[expect] should consume Ok value or throw', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+
+    expect(ok.expect('error message')).toBe(2);
+    expect(() => err.expect('error message')).toThrow('error message');
+  });
+
+  test('[expectErr] should consume Err value or throw', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+
+    expect(() => ok.expectErr('error message')).toThrow('error message');
+    expect(err.expectErr('error message')).toBe('error');
+  });
+
+  test('[unwrapErr] should consume Err value or throw', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+
+    expect(() => ok.unwrapErr()).toThrow();
+    expect(err.unwrapErr()).toBe('error');
+  });
+
+  test('[and] should return resb if value is Ok or Err of self', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+    const ok2 = new Ok<number, string>(3);
+    const err2 = new Err('error2');
+
+    expect(ok.and(ok2)).toMatchObject(ok2);
+    expect(ok.and(err2)).toMatchObject(err2);
+    expect(err.and(ok2)).toMatchObject(err);
+    expect(err.and(err2)).toMatchObject(err);
+  });
+
+  test('[andThen] should compute resb if value is Ok value or Err of self', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+    const ok2 = new Ok<number, string>(3);
+    const err2 = new Err('error2');
+
+    expect(ok.andThen(() => ok2)).toMatchObject(ok2);
+    expect(ok.andThen(() => err2)).toMatchObject(err2);
+    expect(err.andThen(() => ok2)).toMatchObject(err);
+    expect(err.andThen(() => err2)).toMatchObject(err);
+  });
+
+  test('[or] should return Ok value or Err', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+    const ok2 = new Ok<number, string>(3);
+    const err2 = new Err<number, string>('error2');
+
+    expect(ok.or(ok2)).toMatchObject(ok);
+    expect(ok.or(err2)).toMatchObject(ok);
+    expect(err.or(ok2)).toMatchObject(ok2);
+    expect(err.or(err2)).toMatchObject(err2);
+  });
+
+  test('[inspect] should call function with Ok value or not call if Err', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+    const fn = jest.fn();
+
+    ok.inspect(fn);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(2);
+
+    err.inspect(fn);
+    expect(fn).toHaveBeenCalledTimes(1);
+  });
+
+  test('[inspectErr] should call function with Err value or not call if Ok', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+    const fn = jest.fn();
+
+    ok.inspectErr(fn);
+    expect(fn).toHaveBeenCalledTimes(0);
+
+    err.inspectErr(fn);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith('error');
+  });
+
+  test('should stringify properly', () => {
+    const ok = new Ok(2);
+    const err = new Err('error');
+
+    expect(ok.toString()).toBe('Ok(2)');
+    expect(err.toString()).toBe('Err(error)');
+  });
+
+  test('should itrerate over the value', () => {
+    const result = new Ok(2);
+    const fn = jest.fn();
+
+    for (const value of result.iter()) {
+      fn(value.unwrap());
+    }
+
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(2);
   });
 });

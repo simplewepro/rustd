@@ -1,4 +1,4 @@
-import { Some, None, OptionType, Option } from './Option';
+import { Some, None, OptionType } from './Option';
 import { Err, Ok } from './Result';
 
 describe('Option tests', () => {
@@ -305,15 +305,16 @@ describe('Option tests', () => {
     const some = new Some(2);
     const none = new None();
 
-    const inspector = jest.fn();
+    const fn = jest.fn();
 
-    some.inspect(inspector);
+    some.inspect(fn);
 
-    expect(inspector).toHaveBeenCalledWith(2);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(2);
 
-    none.inspect(inspector);
+    none.inspect(fn);
 
-    expect(inspector).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledTimes(1);
   });
 
   test('[toString] should stringify properly', () => {
