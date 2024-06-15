@@ -1,6 +1,6 @@
 /* tslint:disable:max-line-length */
-import { None, Some } from './Option';
-import { Err, Ok, ResultType } from './Result';
+import { None, Some } from '../lib/option';
+import { Err, Ok, ResultType } from '../lib/result';
 
 describe('Result tests', () => {
   test('[type] should be correct', () => {

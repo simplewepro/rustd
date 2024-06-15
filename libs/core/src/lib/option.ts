@@ -1,6 +1,6 @@
 import { inspect } from 'util';
 
-import { Err, Ok, Result } from './Result';
+import { Err, Ok, Result } from './result';
 
 export type Option<T> = Some<T> | None<T>;
 

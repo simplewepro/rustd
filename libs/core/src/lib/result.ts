@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import { None, Option, Some } from './Option';
+import { None, Option, Some } from './option';
 
 export type Result<T, E> = Ok<T, E> | Err<T, E>;
 

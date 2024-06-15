@@ -1,5 +1,5 @@
-import { Some, None, OptionType } from './Option';
-import { Err, Ok } from './Result';
+import { Some, None, OptionType } from '../lib/option';
+import { Err, Ok } from '../lib/result';
 
 describe('Option tests', () => {
   test('[type] should be correct ', () => {
