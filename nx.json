@@ -9,11 +9,17 @@
   "targetDefaults": {
     "build": {
       "cache": true,
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     },
     "@nx/jest:jest": {
       "cache": true,
-      "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+      "inputs": [
+        "default",
+        "^default",
+        "{workspaceRoot}/jest.preset.js"
+      ],
       "options": {
         "passWithNoTests": true
       },
@@ -34,5 +40,6 @@
       ]
     }
   },
-  "nxCloudAccessToken": "MzFmNjFhYmItN2JmNi00MzI2LWFmZjUtN2FhZWU3MzFmNGZkfHJlYWQtd3JpdGU="
+  "nxCloudAccessToken": "MzFmNjFhYmItN2JmNi00MzI2LWFmZjUtN2FhZWU3MzFmNGZkfHJlYWQtd3JpdGU=",
+  "useInferencePlugins": false
 }
