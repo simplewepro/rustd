@@ -32,9 +32,9 @@ async function getDataAsResult(): Result<string, number> {
   try {
     const data = await fetch('some.data.url');
 
-    return new Ok(data.body)
+    return new Ok(data.body);
   } catch (error) {
-    return new Err(error.status)
+    return new Err(error.status);
   }
 }
 
@@ -45,14 +45,14 @@ const result = await getDataAsResult();
 if (retult.isOk()) {
   // ^? const result: Ok<string, number>
   const value = result.unwrap(); // => '42 of course!'
-};
+}
 
 // ...and they even say you what methods you shouldn't call
 if (result.isErr()) {
   //^? const result: Err<string, number>
   const resultValue = result.unwrap(); // throws and error
   //    ^? const resultValue: never
-};
+}
 ```
 
 > **TBD:** exhaustive `match` and `if let` helper functions and transpiler's plugins
@@ -89,9 +89,7 @@ function getOptional(condition): Option<number> {
 
 const opt = getOptional(Math.random() > 0.5);
 //      ^? const opt: Option<number>
-const value = opt
-  .map(value => value * 2)
-  .unwrapOr(69) // safely providing default value as 69, if 42 hasn't come to the party
+const value = opt.map((value) => value * 2).unwrapOr(69); // safely providing default value as 69, if 42 hasn't come to the party
 ```
 
 ### More details
