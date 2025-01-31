@@ -1,0 +1,133 @@
+[NX Daemon Server] - 2025-01-31T00:48:32.473Z - Started listening on: /tmp/17b890660fbd225ba9d1/d.sock
+[NX Daemon Server] - 2025-01-31T00:48:32.475Z - [WATCHER]: Subscribed to changes within: /home/amalinin/Projects/rustd (native)
+[NX Daemon Server] - 2025-01-31T00:48:32.549Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:32.549Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:32.551Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:32.551Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:32.551Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:32.552Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:32.560Z - Time taken for 'loadSpecifiedNxPlugins' 0.7516980000000046ms
+[NX Daemon Server] - 2025-01-31T00:48:32.682Z - Time taken for 'Load Nx Plugin: /home/amalinin/Projects/rustd/node_modules/nx/src/plugins/project-json/build-nodes/project-json' 128.467464ms
+[NX Daemon Server] - 2025-01-31T00:48:32.683Z - Time taken for 'Load Nx Plugin: /home/amalinin/Projects/rustd/node_modules/nx/src/plugins/package-json' 130.11020800000003ms
+[NX Daemon Server] - 2025-01-31T00:48:32.701Z - [REQUEST]: Updated workspace context based on watched changes, recomputing project graph...
+[NX Daemon Server] - 2025-01-31T00:48:32.702Z - [REQUEST]: 
+[NX Daemon Server] - 2025-01-31T00:48:32.702Z - [REQUEST]: 
+[NX Daemon Server] - 2025-01-31T00:48:32.707Z - Time taken for 'loadDefaultNxPlugins' 148.307504ms
+[NX Daemon Server] - 2025-01-31T00:48:32.733Z - Time taken for 'build-project-configs' 15.619156000000032ms
+[NX Daemon Server] - 2025-01-31T00:48:32.776Z - [SYNC]: collect registered sync generators
+[NX Daemon Server] - 2025-01-31T00:48:32.778Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.780Z - Time taken for 'total for creating and serializing project graph' 225.448645ms
+[NX Daemon Server] - 2025-01-31T00:48:32.781Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.781Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 225. Response time: 4.
+[NX Daemon Server] - 2025-01-31T00:48:32.786Z - [REQUEST]: Responding to the client with an error. Invalid payload from the client Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+Error: Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+    at handleMessage (/home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:175:104)
+    at /home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:74:15
+    at Socket.<anonymous> (/home/amalinin/Projects/rustd/node_modules/nx/src/utils/consume-messages-from-socket.js:13:17)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[NX Daemon Server] - 2025-01-31T00:48:32.787Z - Done responding to the client null
+[NX Daemon Server] - 2025-01-31T00:48:32.889Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:32.889Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.890Z - Time taken for 'total for creating and serializing project graph' 0.8460270000000492ms
+[NX Daemon Server] - 2025-01-31T00:48:32.891Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.891Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 2.
+[NX Daemon Server] - 2025-01-31T00:48:32.894Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:32.895Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.895Z - Time taken for 'total for creating and serializing project graph' 0.3462729999999965ms
+[NX Daemon Server] - 2025-01-31T00:48:32.896Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:32.896Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:32.899Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:33.903Z - Established a connection. Number of open connections: 3
+[NX Daemon Server] - 2025-01-31T00:48:33.904Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:33.905Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.905Z - Time taken for 'total for creating and serializing project graph' 0.362856999999849ms
+[NX Daemon Server] - 2025-01-31T00:48:33.905Z - Closed a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:33.906Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.906Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:33.908Z - [REQUEST]: Responding to the client with an error. Invalid payload from the client Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+Error: Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+    at handleMessage (/home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:175:104)
+    at /home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:74:15
+    at Socket.<anonymous> (/home/amalinin/Projects/rustd/node_modules/nx/src/utils/consume-messages-from-socket.js:13:17)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[NX Daemon Server] - 2025-01-31T00:48:33.909Z - Done responding to the client null
+[NX Daemon Server] - 2025-01-31T00:48:33.976Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:33.977Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:33.977Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.978Z - Time taken for 'total for creating and serializing project graph' 0.4380020000000968ms
+[NX Daemon Server] - 2025-01-31T00:48:33.978Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.978Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:33.981Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:33.981Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.982Z - Time taken for 'total for creating and serializing project graph' 0.42543300000011186ms
+[NX Daemon Server] - 2025-01-31T00:48:33.982Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:33.982Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:33.985Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:37.988Z - Established a connection. Number of open connections: 3
+[NX Daemon Server] - 2025-01-31T00:48:37.989Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:37.989Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:37.990Z - Time taken for 'total for creating and serializing project graph' 0.29740700000002107ms
+[NX Daemon Server] - 2025-01-31T00:48:37.990Z - Closed a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:37.990Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:37.990Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:37.993Z - [REQUEST]: Responding to the client with an error. Invalid payload from the client Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+Error: Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+    at handleMessage (/home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:175:104)
+    at /home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:74:15
+    at Socket.<anonymous> (/home/amalinin/Projects/rustd/node_modules/nx/src/utils/consume-messages-from-socket.js:13:17)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[NX Daemon Server] - 2025-01-31T00:48:37.993Z - Done responding to the client null
+[NX Daemon Server] - 2025-01-31T00:48:38.061Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:38.063Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:38.063Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:38.063Z - Time taken for 'total for creating and serializing project graph' 0.401756999999634ms
+[NX Daemon Server] - 2025-01-31T00:48:38.064Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:38.064Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:38.066Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:38.066Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:38.066Z - Time taken for 'total for creating and serializing project graph' 0.2805020000005243ms
+[NX Daemon Server] - 2025-01-31T00:48:38.067Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:38.067Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:38.069Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:47.073Z - Established a connection. Number of open connections: 3
+[NX Daemon Server] - 2025-01-31T00:48:47.074Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:47.075Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.075Z - Time taken for 'total for creating and serializing project graph' 0.3675419999999576ms
+[NX Daemon Server] - 2025-01-31T00:48:47.075Z - Closed a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-31T00:48:47.076Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.076Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 1. Response time: 1.
+[NX Daemon Server] - 2025-01-31T00:48:47.078Z - [REQUEST]: Responding to the client with an error. Invalid payload from the client Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+Error: Unsupported payload sent to daemon server: {"type":"REQUEST_FILE_DATA"}
+    at handleMessage (/home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:175:104)
+    at /home/amalinin/Projects/rustd/node_modules/nx/src/daemon/server/server.js:74:15
+    at Socket.<anonymous> (/home/amalinin/Projects/rustd/node_modules/nx/src/utils/consume-messages-from-socket.js:13:17)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23)
+[NX Daemon Server] - 2025-01-31T00:48:47.078Z - Done responding to the client null
+[NX Daemon Server] - 2025-01-31T00:48:47.155Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-31T00:48:47.158Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:47.158Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.159Z - Time taken for 'total for creating and serializing project graph' 0.49988499999926717ms
+[NX Daemon Server] - 2025-01-31T00:48:47.160Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.161Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 3.
+[NX Daemon Server] - 2025-01-31T00:48:47.163Z - [REQUEST]: Client Request for Project Graph Received
+[NX Daemon Server] - 2025-01-31T00:48:47.163Z - [REQUEST]: Responding to the client. project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.165Z - Done responding to the client project-graph
+[NX Daemon Server] - 2025-01-31T00:48:47.165Z - Handled REQUEST_PROJECT_GRAPH. Handling time: 0. Response time: 2.
+[NX Daemon Server] - 2025-01-31T00:48:47.165Z - Time taken for 'total for creating and serializing project graph' 0.27357500000107393ms
+[NX Daemon Server] - 2025-01-31T00:48:47.167Z - Established a connection. Number of open connections: 2
