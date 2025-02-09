@@ -1,1 +1,1 @@
-npx nx affected -t lint,test --parallel=2
+npx nx affected -t lint,test,type-check --parallel=3
