@@ -330,7 +330,7 @@ export class Some<T> extends OptionBase<T> {
     return this;
   }
 
-  public override xor(optb: Option<T>): Option<T> {
+  public override xor(optb: Option<NoInfer<T>>): Option<T> {
     if (optb.isNone()) return this;
     return new None<T>();
   }
@@ -396,7 +396,9 @@ export class Some<T> extends OptionBase<T> {
   }
 }
 
-export class None<T> extends OptionBase<T> {
+// `any` Needed for untyped None's
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class None<T = any> extends OptionBase<T> {
   protected _type = OptionType.None;
   protected _value?: T;
 
