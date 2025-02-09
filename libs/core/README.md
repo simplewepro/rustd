@@ -28,7 +28,7 @@ const typeError = new Err(new TypeError('Some types does not match!'));
 ### Typical usage
 
 ```typescript
-async function getDataAsResult(): Result<string, number> {
+async function getDataAsResult(): Promise<Result<string, number>> {
   try {
     const data = await fetch('some.data.url');
 
@@ -53,6 +53,15 @@ if (result.isErr()) {
   const resultValue = result.unwrap(); // throws and error
   //    ^? const resultValue: never
 }
+```
+
+Or use more idiomatic ways:
+
+```typescript
+const data = result.unwrapOrElse(error => {
+  logger.log(`ERROR: ${error}`);
+  process.exit(1);
+})
 ```
 
 > **TBD:** exhaustive `match` and `if let` helper functions and transpiler's plugins

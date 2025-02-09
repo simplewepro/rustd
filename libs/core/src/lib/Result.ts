@@ -8,11 +8,12 @@ export enum ResultType {
   Err,
 }
 
-abstract class ResultBase<T, E> {
+export abstract class ResultBase<T, E> {
   /**
    * @type {ResultType} Ok | Err
    */
   protected abstract _type: ResultType;
+  protected abstract _value: T | E;
 
   public get type() {
     return this._type;
@@ -156,7 +157,7 @@ abstract class ResultBase<T, E> {
    * @param  {string} message
    * @returns `T`
    */
-  public abstract expect(message: string): T | never;
+  public abstract expect(message: Error | string): T | never;
 
   /**
    * A method, that if the result is `Err`, returns the contained value, otherwise throws an error with the provided `message`
@@ -201,6 +202,8 @@ abstract class ResultBase<T, E> {
   }
 }
 
+export const Result = ResultBase;
+
 export class Ok<T, E> extends ResultBase<T, E> {
   protected _type = ResultType.Ok;
 
@@ -234,8 +237,8 @@ export class Ok<T, E> extends ResultBase<T, E> {
     return predicate(this._value);
   }
 
-  public override err(): Option<never> {
-    return new None();
+  public override err(): Option<E> {
+    return new None<E>();
   }
 
   public override isErr(): this is Err<T, E> {
@@ -245,15 +248,15 @@ export class Ok<T, E> extends ResultBase<T, E> {
   public override isErrAnd<E>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _predicate: (error: E) => boolean
-  ): this is Err<T, never> {
+  ): this is Err<T, E> {
     return false;
   }
 
-  public override map<U>(val: (value: T) => U): Result<U, never> {
+  public override map<U>(val: (value: T) => U): Result<U, E> {
     return new Ok(val(this._value));
   }
 
-  public override mapOr<U>(def: U, val: (value: T) => U): U {
+  public override mapOr<U>(_def: U, val: (value: T) => U): U {
     return val(this._value);
   }
 
@@ -281,7 +284,7 @@ export class Ok<T, E> extends ResultBase<T, E> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override expect(_message: string): T {
+  public override expect(_message: Error | string): T {
     return this._value;
   }
 
@@ -320,18 +323,18 @@ export class Err<T, E> extends ResultBase<T, E> {
     super();
   }
 
-  public override ok(): Option<never> {
-    return new None();
+  public override ok(): Option<T> {
+    return new None<T>();
   }
 
   public override isOk(): this is Ok<T, E> {
     return false;
   }
 
-  public override isOkAnd<T>(
+  public override isOkAnd(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _predicate: (value: T) => boolean
-  ): this is Ok<never, E> {
+  ): this is Ok<T, E> {
     return false;
   }
 
@@ -353,7 +356,7 @@ export class Err<T, E> extends ResultBase<T, E> {
     throw new Error(`${this._value}`);
   }
 
-  public override unwrapOr<T>(def: T): T {
+  public override unwrapOr(def: T): T {
     return def;
   }
 
@@ -376,7 +379,7 @@ export class Err<T, E> extends ResultBase<T, E> {
     return err(this._value);
   }
 
-  public override mapErr<F>(val: (error: E) => F): Result<never, F> {
+  public override mapErr<F>(val: (error: E) => F): Result<T, F> {
     return new Err(val(this._value));
   }
 
@@ -391,8 +394,12 @@ export class Err<T, E> extends ResultBase<T, E> {
     return this;
   }
 
-  public override expect(message: string): never {
-    throw new Error(`${message}: ${this._value}`);
+  public override expect(message: Error | string): never {
+    if (typeof message === 'string') {
+      throw new Error(`${message}: ${this._value}`);
+    }
+
+    throw message;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
