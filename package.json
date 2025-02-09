@@ -30,7 +30,7 @@
     "verdaccio": "^5.0.4"
   },
   "workspaces": [
-    "packages/*"
+    "libs/*"
   ],
   "nx": {
     "includedScripts": []
