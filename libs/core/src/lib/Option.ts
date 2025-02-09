@@ -2,14 +2,14 @@ import { inspect } from 'util';
 
 import { Err, Ok, Result } from './Result';
 
-export type Option<T> = Some<T> | None;
+export type Option<T> = Some<T> | None<T>;
 
 export enum OptionType {
   Some,
   None,
 }
 
-abstract class OptionBase<T> {
+export abstract class OptionBase<T> {
   /**
    * @type {OptionType} Some | None
    */
@@ -43,7 +43,7 @@ abstract class OptionBase<T> {
    *
    * @returns `boolean`
    */
-  public abstract isNone(): this is None;
+  public abstract isNone(): this is None<T>;
 
   /**
    * Returns contained `Some` value or throws an error with a provided message if `None`
@@ -51,10 +51,10 @@ abstract class OptionBase<T> {
    * @returns {T}
    * @throws {Error} with the provided message if contained value is `None`
    */
-  public abstract expect(message: string): T;
+  public abstract expect(message: Error | string): T | never;
 
   /**
-   * A method to unwrap the value from a result. Might throw an error if the result is an `Err`
+   * A method to unwrap the value from a result. Might throw an error if the option is `None`
    *
    * Also available as a type guard
    *
@@ -228,12 +228,24 @@ abstract class OptionBase<T> {
    */
   public abstract replace(value: T): Option<T>;
 
+  public abstract flattenNullable<R = NonNullable<T>>(): Option<R>;
+
+  static from<T, R = NonNullable<T>>(value: T): Option<R> {
+    if (typeof value !== 'undefined' && value !== null) {
+      return new Some<R>(value as R);
+    }
+
+    return new None<R>();
+  }
+
   public abstract toString(): string;
 
   [inspect.custom](): string {
     return this.toString();
   }
 }
+
+export const Option = OptionBase;
 
 export class Some<T> extends OptionBase<T> {
   protected _type = OptionType.Some;
@@ -250,12 +262,12 @@ export class Some<T> extends OptionBase<T> {
     return predicate(this._value);
   }
 
-  public override isNone(): this is None {
+  public override isNone(): this is None<T> {
     return false;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override expect(_messsage: string): T {
+  public override expect(_messsage: Error | string): T {
     return this._value;
   }
 
@@ -305,7 +317,7 @@ export class Some<T> extends OptionBase<T> {
   }
 
   public override filter(predicate: (value: T) => boolean): Option<T> {
-    return predicate(this._value) ? new Some(this._value) : new None();
+    return predicate(this._value) ? new Some(this._value) : new None<T>();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -354,7 +366,7 @@ export class Some<T> extends OptionBase<T> {
       return this.take();
     }
 
-    return new None();
+    return new None<T>();
   }
 
   public override replace(value: T): Option<T> {
@@ -371,12 +383,20 @@ export class Some<T> extends OptionBase<T> {
     return this;
   }
 
+  public override flattenNullable<R = NonNullable<T>>(): Option<R> {
+    if (typeof this._value !== 'undefined' || this._value !== null) {
+      return new Some<R>(this._value as R);
+    }
+
+    return new None();
+  }
+
   public override toString(): string {
     return `Some(${JSON.stringify(this._value)})`;
   }
 }
 
-export class None<T = unknown> extends OptionBase<T> {
+export class None<T> extends OptionBase<T> {
   protected _type = OptionType.None;
   protected _value?: T;
 
@@ -395,8 +415,8 @@ export class None<T = unknown> extends OptionBase<T> {
     return true;
   }
 
-  public override expect(message: string): never {
-    throw new Error(message);
+  public override expect(message: Error | string): never {
+    throw message;
   }
 
   public override unwrap(): never {
@@ -413,7 +433,7 @@ export class None<T = unknown> extends OptionBase<T> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override map<U>(_val: (value: T) => U) {
-    return this;
+    return new None<U>();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -439,12 +459,12 @@ export class None<T = unknown> extends OptionBase<T> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override and<U>(_optb: Option<U>): Option<U> {
-    return this;
+    return new None<U>();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override andThen<U>(_def: (value: T) => Option<U>): Option<U> {
-    return this;
+    return new None<U>();
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -501,6 +521,10 @@ export class None<T = unknown> extends OptionBase<T> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public override inspect(_callback: (value: T) => void): this {
     return this;
+  }
+
+  public override flattenNullable<R = NonNullable<T>>(): Option<R> {
+    return new None<R>();
   }
 
   public override toString(): string {
