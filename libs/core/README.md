@@ -58,10 +58,10 @@ if (result.isErr()) {
 Or use more idiomatic ways:
 
 ```typescript
-const data = result.unwrapOrElse(error => {
+const data = result.unwrapOrElse((error) => {
   logger.log(`ERROR: ${error}`);
   process.exit(1);
-})
+});
 ```
 
 > **TBD:** exhaustive `match` and `if let` helper functions and transpiler's plugins

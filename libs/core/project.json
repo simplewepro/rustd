@@ -22,6 +22,16 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"]
     },
+    "type-check": {
+      "executor": "@nx/js:tsc",
+      "options": {
+        "main": "libs/core/src/index.ts",
+        "tsConfig": "libs/core/tsconfig.lib.json",
+        "project": "libs/core/tsconfig.lib.json",
+        "outputPath": "dist/libs/core",
+        "noEmit": true
+      }
+    },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
