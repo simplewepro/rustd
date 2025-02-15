@@ -185,6 +185,26 @@ export abstract class ResultBase<T, E> {
   public abstract or<F>(resb: Result<T, F>): Result<T, F>;
 
   /**
+   * [WIP]
+   * @returns {Promise<Result<T, E>>}
+   */
+  async await<RT = T extends Promise<infer R> ? R : T>(): Promise<
+    Result<RT, E>
+  > {
+    if (this._value instanceof Promise) {
+      return this._value
+        .then((v) => new Ok<RT, E>(v))
+        .catch((e) => new Err<RT, E>(e));
+    }
+
+    return (
+      this.isOk()
+        ? new Ok<T, E>(this.unwrap())
+        : new Err<RT, E>(this.unwrapErr())
+    ) as Result<RT, E>;
+  }
+
+  /**
    * A method that returns an iterator over the possibly contained value.
    *
    * The iterator yields one value if the result is `Ok`, otherwise `None`.
